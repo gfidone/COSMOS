@@ -1,0 +1,281 @@
+import torch
+import numpy as np
+import pandas as pd
+import networkx as nx
+import warnings
+import random
+import time
+import re
+from tqdm.notebook import tqdm
+from perspective_api import detector
+from prompt import Prompt
+from user import User
+
+
+class Simulator():
+
+    def __init__(self, pipeline, thread_prob, profiles, moderate_template, topics, comment_prob=1, tau=3, thr=0.5): 
+        
+        self.pipeline = pipeline
+        self.topics = topics
+        self.attributes = list(profiles[0].keys()) 
+        self.moderate_prompt = Prompt(moderate_template, self.attributes)
+        self.thread_prob = thread_prob 
+        self.comment_prob = comment_prob
+        self.tau = tau
+        self.thr=0.5
+        self.n_users = len(profiles)
+        self.profiles = profiles
+    
+    def _interact(self):
+        '''Make users undertake actions.'''
+        
+        random.seed(self.seeds.pop())
+        random.shuffle(self.users)
+        for user in tqdm(self.users, desc=f'Timestep {self.current_timestep}: simulating user interactions'):
+            data = {'user_id':user.id,
+                    'memory':user.interventions[-self.memory_size:],
+                    'time':self.current_timestep,
+                    'seed':self.seeds.pop()
+                   }
+            action_data = self._action(user=user, seed=data['seed'])
+            if action_data['l_content'] is not None and action_data['a_content'] is not None:
+                data.update(action_data)
+                self._add_to_feed(thread_id = data['thread_id'],
+                                  parent_id = data['parent_id'],
+                                  **{'username':user.profile['username'],
+                                 'l_content':data['l_content'],
+                                 'a_content':data['a_content']}) 
+                self.history[self.current_timestep].append(data)
+    
+    def _add_to_feed(self, thread_id=None, parent_id=None, **attributes):
+        '''Add a new node in the news feed.'''
+        
+        if parent_id == None: # if the node is a root node
+            thread = nx.DiGraph() 
+            thread.add_node(self.n_nodes, **attributes) 
+            self.feed.append(thread) 
+        else:
+            self.feed[thread_id].add_node(self.n_nodes, **attributes) 
+            self.feed[thread_id].add_edge(parent_id, self.n_nodes) 
+        self.n_nodes +=1
+        
+    def _action(self, user, seed): 
+        '''Executes action.'''
+        
+        data = {k: None for k in ['topic', 'root_id', 'thread_id', 'parent_id', 'node_id', 'l_prompt', 'a_prompt', 
+                                 'l_output', 'a_output', 'l_tags', 'a_tags', 'l_content', 'a_content', 
+                                 'l_toxic_rate', 'a_toxic_rate']} 
+        data.update({'censored': user.banned, 'banned': user.banned})
+        active_stream = not user.banned
+        if self.current_timestep == 0 and user == self.users[0]: # first user at first timestep is forced to post
+            k = 0
+        else:
+            random.seed(self.seeds.pop())
+            k = random.random()
+        if k <= self.thread_prob:
+            random.seed(self.seeds.pop()) 
+            data['topic'] = random.choice(self.topics) # select topic 
+            seed = self.seeds.pop() 
+            data.update(user.generate(topic=data['topic'], 
+                                      generation_config=self.generation_config, 
+                                      active_stream=active_stream, 
+                                      seed=seed))
+            data['l_toxic_rate'], data['a_toxic_rate'] = self._get_toxic_rates(data)
+            data['thread_id'] = len(self.feed)
+            data['node_id'] = self.n_nodes
+            data['root_id'] = data['node_id']
+        else:
+            if len(self.feed) > 0:
+                data['thread_id'], data['parent_id'], censored = self._sample_content(user)
+                random.seed(self.seeds.pop())
+                if random.random() <= self.comment_prob: 
+                    if censored: 
+                        data['censored'] = True # if parent node is censored (for ban), terminate on moderated stream
+                        active_stream = False 
+                    parent = self.feed[data['thread_id']].nodes[data['parent_id']]
+                    data['root_id'], root = self._get_root(data['thread_id'])
+                    seed = self.seeds.pop()
+                    data.update(user.generate(parent=parent, 
+                                              root=root, 
+                                              generation_config=self.generation_config, 
+                                              active_stream=active_stream, 
+                                              seed=seed))
+                    data['l_toxic_rate'], data['a_toxic_rate'] = self._get_toxic_rates(data)
+                    data['node_id'] = self.n_nodes
+        return data
+    
+    def _get_toxic_rates(self, data):
+        '''Returns toxic rates for a node.'''
+        
+        l_t = detector(data['l_content'])
+        a_t = l_t if data['l_content'] == data['a_content'] else detector(data['a_content'])
+        return l_t, a_t
+    
+    def _sample_content(self, user):
+        '''Gets a node from a time-adaptive probability distribution.'''
+        
+        time_distribution = {(node['thread_id'], node['node_id'], node['user_id'], node['l_content'], node['a_content'], node['censored']): self.history.index(timestep)
+        for timestep in self.history for node in timestep if node['node_id'] is not None}
+        for info in time_distribution:
+            is_author_of_child = self._is_author_of_child(info[0], info[1], user)
+            if info[2] == user.id or is_author_of_child: 
+                time_distribution[info] = np.NINF
+        probs = self._softmax(list(time_distribution.values()))
+        prob_distribution = {info:prob for info, prob in zip(time_distribution, probs)}
+        random.seed(self.seeds.pop())
+        selected_info = random.choices(list(prob_distribution.keys()), 
+                                       weights=list(prob_distribution.values()), 
+                                       k=1)[0]
+        return selected_info[0], selected_info[1], selected_info[5] # thread_id, node_id, censored
+
+    def _softmax(self, logits):
+        '''Softmax function.'''
+        
+        logits = np.array(logits)
+        max_logits = np.max(logits, axis=-1, keepdims=True)
+        logits = (logits - max_logits) / self.tau
+        exp_logits = np.exp(logits)
+        probs = exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
+        return probs
+        
+    def _is_author_of_child(self, thread_id, node_id, user):
+        '''Checks if user is the author of a node.'''
+        thread = self.feed[thread_id]
+        children = list(thread.successors(node_id))
+        for child in children:
+            if thread.nodes[child].get('user_id') == user.id: 
+                return True
+        return False
+    
+    def _moderate(self):
+        '''Executes moderation (interventions and/or bans).'''      
+        for i, node in enumerate(tqdm(self.history[self.current_timestep], desc=f'Timestep {self.current_timestep}: simulating moderation')):
+            if node['a_content'] is not None:
+                user = self.get_user_by_id(node['user_id'])
+                if node['a_toxic_rate'] is not None and node['a_toxic_rate'] > self.thr:
+                    user.n_toxic_actions +=1
+                    if self.intervene:
+                        self._intervene(user, i, node)
+                    if self.ban: 
+                        self._ban(user)
+    
+    def _intervene(self, user, i, node):
+        '''Implements ex ante moderation.'''
+        
+        if self.one_size_fits_all:
+            intervention = self.intervention
+            moderate_prompt = None
+        else:
+            node = self.feed[node['thread_id']].nodes[node['node_id']]
+            if self.intervene_func == None:
+                moderate_prompt = self.moderate_prompt(content=node['a_content'], 
+                                                       **user.profile)
+                output, correct_tags, intervention = self.pipeline.inference(moderate_prompt, 
+                                                                             seed=self.moderate_seeds.pop(0))
+            else:
+                intervention = self.intervene_func(node['a_content']) # wrapper
+        user.interventions.append(intervention)
+        self.history[self.current_timestep][i]['intervention'] = intervention
+        self.history[self.current_timestep][i]['moderate_prompt'] = moderate_prompt
+    
+    def _ban(self, user):   
+        '''Executes ban.'''
+        
+        if not user.banned:
+            if user.n_toxic_actions >= self.tolerance:
+                user.banned = True
+                self.active_users.remove(user)
+                
+    def _get_root(self, thread_id):
+        'Returns the root of a tree.'
+        
+        roots_ids = [node_id for node_id, degree in self.feed[thread_id].in_degree() if degree==0] 
+        if len(roots_ids) > 1:
+            raise IndexError('Found more than one root')
+        return roots_ids[0], self.feed[thread_id].nodes[roots_ids[0]]
+
+    def get_user_by_id(self, id):
+        '''Returns the user with id.'''
+        
+        for user in self.users:
+            if user.id == id:
+                return user    
+    
+    def _step(self):
+        '''Executes timestep'''
+        
+        self.history.append(list())
+        self._interact() 
+        if self.current_timestep < self.n_timesteps - 1:
+            self._moderate()
+                
+    def run(self, n_timesteps, unbiased_post_template, biased_post_template, unbiased_comment_template, biased_comment_template, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None,
+                 generation_config=None, seed=None, active_stream=True, experiment_id=None):
+        '''Runs the simulation.'''
+        
+        self.n_timesteps = n_timesteps
+        self.intervene = intervene
+        self.ban = ban
+        self.memory_size = memory_size
+        self.one_size_fits_all = one_size_fits_all
+        self.intervention = intervention
+        self.tolerance = tolerance
+        self.generation_config = generation_config
+        self.active_stream = active_stream
+        self.experiment_id = experiment_id
+        self.seed = self.seed = random.randint(0, 2**32 - 1) if seed == None else seed
+        self.feed = list() 
+        self.history = list() 
+        self.users = [User(self.pipeline, id, profile, unbiased_post_template, biased_post_template, unbiased_comment_template, biased_comment_template, memory_size=self.memory_size) for id, profile in enumerate(self.profiles)] 
+        self.active_users = [user for user in self.users]
+        self.current_timestep = -1
+        self.n_nodes = 0
+        
+        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + self.n_timesteps*(self.n_users*6) # number of seeds needed in the worst case scenario
+        
+        random.seed(self.seed)
+        self.seeds = [random.randint(0, 2**32 - 1) for _ in range(max_seeds)]
+        
+        random.seed(self.seed)
+        self.moderate_seeds = [random.randint(0, 2**32 - 1) for _ in range(self.n_users*self.n_timesteps)]
+                    
+        for i in tqdm(range(self.n_timesteps), desc=f'Simulation'):
+            self.current_timestep += 1
+            if len(self.active_users): 
+                self._step() 
+            else:
+                warnings.warn('All users have been banned.')
+                break
+    
+    def export(self, path=None):
+        '''Exports data of experiment as csv.'''
+        
+        if not self.history:
+            raise TypeError('simulation data not found: execute run() before exporting data')
+        
+        data = list()
+        
+        for time in self.history:
+            for record in time:
+                example = record
+                example.update({
+                                'simulate_seed':self.seed,
+                                'thread_prob':self.thread_prob,
+                                'comment_prob':self.comment_prob,
+                                'intervene':self.intervene,
+                                'ban':self.ban,
+                                'memory_size':self.memory_size,
+                                'one_size_fits_all':self.one_size_fits_all,
+                                'tolerance':self.tolerance,
+                                'generation_config':self.generation_config, 
+                               })
+                example.update(self.get_user_by_id(example['user_id']).profile)
+                data.append(example)
+                
+        data = pd.DataFrame(data)
+        if path is None:
+            raise TypeError('you must enter a valid path for dowloading csv file')
+        else:
+            data.to_csv(path)
+    
