@@ -23,7 +23,7 @@ class Simulator():
         self.thread_prob = thread_prob 
         self.comment_prob = comment_prob
         self.tau = tau
-        self.thr=0.5
+        self.thr=thr
         self.n_users = len(profiles)
         self.profiles = profiles
     
