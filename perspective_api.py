@@ -51,12 +51,12 @@ class PerspectiveAPI:
         else:
             return scores
         
-    def annotate(self, texts, return_all=False): # check how to pass 160 texts per second (new query limit)
+    def annotate(self, texts, return_all=False): 
         scores = list()
         for text in tqdm(texts):
             scores.append(self.__call__(text, return_all=return_all))
             self.counter += 1
-            if self.counter == 160:
+            if self.counter == 160: # query limit /s
                 time.sleep(1)
                 self.counter = 0
         return scores
