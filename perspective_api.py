@@ -62,7 +62,7 @@ class PerspectiveAPI:
         return scores
             
         
-API_KEY = 'AIzaSyAlh7RHlDMVcvgP5wK6EhrvrpWq4YDhlLw'
+API_KEY = None # your API key
 detector = PerspectiveAPI(API_KEY)
         
     
