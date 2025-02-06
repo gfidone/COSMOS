@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="cosmos.png" width="500"/>
+  <img src="cosmos.png" width="600"/>
 </p>
 
 ### What is COSMOS?
