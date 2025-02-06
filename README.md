@@ -7,7 +7,9 @@ COSMOS (COunterfactual Simulations of MOderation Strategies) is an Online Social
 
 ### Why COSMOS?
 Assessing if a content moderation strategy is successfull or not can be challenging, for three reasons: 
+
 1. The API restrictions imposed by private platforms prevent the collection of large amounts of evidence;
 2. Toxic behavior is (fortunately) unfrequent;
 3. Field observation can be biased by unkown confounders.
+   
 With COSMOS, we provide a cost-effective, maximally controllable solution for *generating* your evidence rather than *collecting* it from the real world.
