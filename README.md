@@ -15,7 +15,7 @@ Assessing if a content moderation strategy is successfull or not can be challeng
 With COSMOS, we provide a cost-effective, maximally controllable solution for *generating* your evidence rather than *collecting* it from the real world.
 
 <p align="center">
-  <img src="toxicity.png" width="500"/>
+  <img src="docs/toxicity.png" width="500"/>
 </p>
 
 ### How does COSMOS work?
