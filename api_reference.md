@@ -1,8 +1,9 @@
-**API Reference**
+# COSMOS: API Reference
 
-- Class `Simulator`
-  - `__init__(model_path, thread_prob, comment_prob, tau, thr, topics, moderate_template, profiles)`
-    
+## Class `Simulator`
+Inizializes a COSMOS object. 
+### Methods
+- `__init__(model_path, thread_prob, comment_prob, tau, thr, topics, moderate_template, profiles)`
     - `model_path` (*str*): path to the LLM (HuggingFace Hub).
     - `thread_prob` (*float*): probability to generate a post.
     - `comment_prob` (*float*): probability to generate a comment.
@@ -11,7 +12,8 @@
     - `topics` (*list[str]*): array of topics for generating a post.
     - `moderate_template` (*str*): prompt template for moderator in PMI mode. For correct post-processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<user submission></user submission>` (user submission).
     - `profiles` (*list[dict]*): profile modules (as a list of dictionaries). `username` is mandatory.
-  - `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene, intervene_func, ban, memory_size, one_size_fits_all, intervention, tolerance, generation_config, seed, active_stream=True)`
+
+- `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None, generation_config=None, seed=None, active_stream=True)`
     - `n_timesteps` (*int*): number of timestamps.
     - `post_no_memory` (*str*): prompt template for post action without memory. For correct post-processing, it must feature XML tags `<personal information></personal information>` (profile module).
     - `post_no_memory` (*str*): prompt template for post action with memory. For correct post-processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<intervention></intervention>` (memory module).
@@ -27,5 +29,8 @@
     - `generation_config` (*dict | None*, default `None`): configuration for LLM generation as a dictionary of parameters. `max_new_tokens` is mandatory.
     - `seed` (*int | None*, default `None`): random seed for reproducibility.
     - active_stream (*bool*, default `True`): generate counterfactual or not.
-  - `export(path)`
-    - `path` (*str*): path to JSON file with simulation results.
+- `export(path)`
+   - `path` (*str*): path to JSON file with simulation results.
+### Attributes
+- `feed` (*list[tree]*): array of threads as directed graphs (`networkx`).
+- `history` (*list[list[dict]*): array of timestamps, where each times is an array containing a dictionary for storing information about each action.
