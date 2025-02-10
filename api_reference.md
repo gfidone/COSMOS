@@ -10,7 +10,7 @@
     - `thr` (*float*): toxicity threshold for moderator activation.
     - `topics` (*list[str]*): array of topics for generating a post.
     - `moderate_template` (*str*): prompt template for moderator in PMI mode. For correct post-processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<user submission></user submission>` (user submission).
-    - `profiles` (*str*): profile modules (as a list of dictionaries). `username` is mandatory.
+    - `profiles` (*list[dict]*): profile modules (as a list of dictionaries). `username` is mandatory.
   - `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene, intervene_func, ban, memory_size, one_size_fits_all, intervention, tolerance, generation_config, seed, active_stream=True)`
     - `n_timesteps` (*int*): number of timestamps.
     - `post_no_memory` (*str*): prompt template for post action without memory. For correct post-processing, it must feature XML tags `<personal information></personal information>` (profile module).
