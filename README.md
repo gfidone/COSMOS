@@ -26,3 +26,5 @@ COSMOS initializes a population of generative agents with given social, psycholo
    ```bash
     python main.py 
     ```
+# License
+COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
