@@ -1,6 +1,9 @@
-<img src="circle.png" alt="Descrizione" width="50" align="left">
+<img src="docs/circle.png" alt="Descrizione" width="150" align="left">
 
 # COSMOS: API Reference
+</br>
+</br>
+</br>
 
 ## Class `Simulator`
 ### Methods
