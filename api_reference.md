@@ -45,4 +45,4 @@
      
 ### Attributes
 - `feed` (*list[tree]*): array of threads as directed graphs (`networkx`).
-- `history` (*list[list[dict]*): array of timestamps, where each times is an array containing a dictionary for storing information about each action.
+- `history` (*list[list[dict]*): array of timestamps, where each timestamp is an array containing a dictionary for storing information about each action.
