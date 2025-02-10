@@ -8,4 +8,4 @@ cosmos = Simulator(**config.get('init', {}))
 
 if __name__ == '__main__':
     cosmos.run(**config.get('run', {}))
-    cosmos.export(**config.get('path'), {})
+    cosmos.export(**config.get('export'), {})
