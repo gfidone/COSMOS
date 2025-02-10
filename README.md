@@ -26,6 +26,6 @@ COSMOS initializes a population of generative agents with given social, psycholo
    ```bash
     python main.py 
     ```
-Upon completion, simulation data will be stored into a JSON file at the specified `path` in `experiments/config.json`. For more details about `experiments/config.json`, see `api_reference.md`.
+Upon completion, simulation data will be stored into a JSON file at the specified `path` in `experiments/config.json`. For details about `experiments/config.json`, see `api_reference.md`.
 # License
 COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
