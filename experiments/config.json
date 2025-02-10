@@ -3,6 +3,8 @@
         "thread_prob": 0.5,
         "comment_prob": 1,
         "model_path": "w4r10ck/SOLAR-10.7B-Instruct-v1.0-uncensored",
+        "tau": 3,
+        "thr": 0.5,
         "topics": [
             "climate change",
             "vaccination",
