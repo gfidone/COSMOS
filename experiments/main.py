@@ -1,5 +1,5 @@
 import json
-from simulator import Simulator
+from classes.simulator import Simulator
 
 with open('config.json', 'r') as file:
     config = json.load(file)
