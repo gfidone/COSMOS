@@ -25,7 +25,7 @@
     **Runs a simulation.**
     - `n_timesteps` (*int*): number of timestamps.
     - `post_no_memory` (*str*): prompt template for post action without memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module).
-    - `post_no_memory` (*str*): prompt template for post action with memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<intervention></intervention>` (memory module).
+    - `post_memory` (*str*): prompt template for post action with memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<intervention></intervention>` (memory module).
     - `comment_no_memory` (*str*): prompt template for comment action without memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<thread></thread>` (sensory module).
     - `comment_memory` (*str*): prompt template for comment action with memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module), `<thread></thread>` (sensory module) and `<intervention></intervention>` (memory module).
     - `intervene` (*bool*, default `True`): use *ex ante* interventions or not.
