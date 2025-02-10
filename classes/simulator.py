@@ -213,7 +213,7 @@ class Simulator():
             self._moderate()
                 
     def run(self, n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None,
-                 generation_config=None, seed=None, active_stream=True, experiment_id=None):
+                 generation_config=None, seed=None, active_stream=True):
         '''Runs the simulation.'''
         
         self.n_timesteps = n_timesteps
@@ -225,7 +225,6 @@ class Simulator():
         self.tolerance = tolerance
         self.generation_config = generation_config
         self.active_stream = active_stream
-        self.experiment_id = experiment_id
         self.seed = self.seed = random.randint(0, 2**32 - 1) if seed == None else seed
         self.feed = list() 
         self.history = list() 
