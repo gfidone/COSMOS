@@ -8,22 +8,23 @@ import time
 import re
 from tqdm.notebook import tqdm
 from perspective_api import detector
+from pipeline import Pipeline
 from prompt import Prompt
 from user import User
 
 
 class Simulator():
 
-    def __init__(self, pipeline, thread_prob, profiles, moderate_template, topics, comment_prob=1, tau=3, thr=0.5): 
+    def __init__(self, model_path, thread_prob, profiles, moderate_template, topics, comment_prob=1, tau=3, thr=0.5): 
         
-        self.pipeline = pipeline
+        self.pipeline = Pipeline(model_path, device='cuda')
         self.topics = topics
         self.attributes = list(profiles[0].keys()) 
         self.moderate_prompt = Prompt(moderate_template, self.attributes)
         self.thread_prob = thread_prob 
         self.comment_prob = comment_prob
         self.tau = tau
-        self.thr=thr
+        self.thr=0.5
         self.n_users = len(profiles)
         self.profiles = profiles
     
@@ -39,14 +40,13 @@ class Simulator():
                     'seed':self.seeds.pop()
                    }
             action_data = self._action(user=user, seed=data['seed'])
-            if action_data['l_content'] is not None and action_data['a_content'] is not None:
-                data.update(action_data)
-                self._add_to_feed(thread_id = data['thread_id'],
-                                  parent_id = data['parent_id'],
-                                  **{'username':user.profile['username'],
-                                 'l_content':data['l_content'],
-                                 'a_content':data['a_content']}) 
-                self.history[self.current_timestep].append(data)
+            data.update(action_data)
+            self._add_to_feed(thread_id = data['thread_id'],
+                              parent_id = data['parent_id'],
+                              **{'username':user.profile['username'],
+                              'l_content':data['l_content'],
+                              'a_content':data['a_content']}) 
+            self.history[self.current_timestep].append(data)
     
     def _add_to_feed(self, thread_id=None, parent_id=None, **attributes):
         '''Add a new node in the news feed.'''
@@ -120,6 +120,8 @@ class Simulator():
         for info in time_distribution:
             is_author_of_child = self._is_author_of_child(info[0], info[1], user)
             if info[2] == user.id or is_author_of_child: 
+                time_distribution[info] = np.NINF
+            if info[3] is None:
                 time_distribution[info] = np.NINF
         probs = self._softmax(list(time_distribution.values()))
         prob_distribution = {info:prob for info, prob in zip(time_distribution, probs)}
@@ -210,7 +212,7 @@ class Simulator():
         if self.current_timestep < self.n_timesteps - 1:
             self._moderate()
                 
-    def run(self, n_timesteps, unbiased_post_template, biased_post_template, unbiased_comment_template, biased_comment_template, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None,
+    def run(self, n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None,
                  generation_config=None, seed=None, active_stream=True, experiment_id=None):
         '''Runs the simulation.'''
         
@@ -227,18 +229,18 @@ class Simulator():
         self.seed = self.seed = random.randint(0, 2**32 - 1) if seed == None else seed
         self.feed = list() 
         self.history = list() 
-        self.users = [User(self.pipeline, id, profile, unbiased_post_template, biased_post_template, unbiased_comment_template, biased_comment_template, memory_size=self.memory_size) for id, profile in enumerate(self.profiles)] 
+        self.users = [User(self.pipeline, id, profile, post_no_memory, post_memory, comment_no_memory, comment_memory, memory_size=self.memory_size) for id, profile in enumerate(self.profiles)] 
         self.active_users = [user for user in self.users]
         self.current_timestep = -1
         self.n_nodes = 0
         
-        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + self.n_timesteps*(self.n_users*6) # number of seeds needed in the worst case scenario
+        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + 50*(self.n_users*6) # number of seeds needed in the worst case scenario
         
         random.seed(self.seed)
         self.seeds = [random.randint(0, 2**32 - 1) for _ in range(max_seeds)]
         
         random.seed(self.seed)
-        self.moderate_seeds = [random.randint(0, 2**32 - 1) for _ in range(self.n_users*self.n_timesteps)]
+        self.moderate_seeds = [random.randint(0, 2**32 - 1) for _ in range(self.n_users*50)]
                     
         for i in tqdm(range(self.n_timesteps), desc=f'Simulation'):
             self.current_timestep += 1
@@ -277,5 +279,5 @@ class Simulator():
         if path is None:
             raise TypeError('you must enter a valid path for dowloading csv file')
         else:
-            data.to_csv(path)
+            data.to_json(path)
     
