@@ -277,7 +277,7 @@ class Simulator():
                 
         data = pd.DataFrame(data)
         if path is None:
-            raise TypeError('you must enter a valid path for dowloading csv file')
+            raise TypeError('you must enter a valid path for dowloading json file')
         else:
             data.to_json(path)
     
