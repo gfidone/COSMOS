@@ -44,5 +44,5 @@
    - `path` (*str*): path to JSON file with simulation results.
      
 ### Attributes
-- `feed` (*list[tree]*): array of threads as directed graphs (`networkx`).
-- `history` (*list[list[dict]*): array of timestamps, where each timestamp is an array containing a dictionary for storing information about each action.
+- `feed` (*list[networkx.DiGraph]*): array of threads as directed graphs (`networkx`).
+- `history` (*list[list[dict]*): array of timestamps, where each timestamp is an array containing dictionaries for storing information about each action.
