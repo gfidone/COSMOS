@@ -19,7 +19,7 @@ COSMOS initializes a population of generative agents with given social, psycholo
 
 ### How to use COSMOS?
 
-1. Ensure that sufficient GPU memory is available for allocating the selected LLM.
+1. Ensure that sufficient GPU memory is available for allocating the LLM.
 2. Edit the `experiments/config.json` file with your preferred configuration.
 3. Run:
 
