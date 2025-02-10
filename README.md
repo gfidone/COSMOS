@@ -19,4 +19,14 @@ COSMOS initializes a population of generative agents with given social, psycholo
 
 ### How to use COSMOS?
 
-Edit the config.json file with your configuration and run main.py.
+1. Ensure that sufficient GPU memory is available for allocating the selected LLM.
+2. Edit the `config.json` file with your preferred configuration.
+3. Run:
+
+   ```bash
+    python main.py 
+    ```
+Configuration parameters in the config.json file include:
+
+- `thread_prob`: probability to initiate a new thread
+- `comment_prob`: probability to comment
