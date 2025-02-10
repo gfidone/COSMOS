@@ -10,7 +10,7 @@ Assessing if a content moderation strategy is successfull or not can be challeng
 
 1. The API restrictions imposed by private platforms prevent the collection of large amounts of evidence;
 2. Toxic behavior is (fortunately) unfrequent;
-3. Field observation can be biased by unkown confounders.
+3. Field observation can be biased by unknown confounders.
    
 With COSMOS, we provide a cost-effective, maximally controllable solution for *generating* your evidence rather than *collecting* it from the real world.
 
