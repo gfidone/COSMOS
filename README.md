@@ -26,7 +26,3 @@ COSMOS initializes a population of generative agents with given social, psycholo
    ```bash
     python main.py 
     ```
-Configuration parameters in the config.json file include:
-
-- `thread_prob`: probability to initiate a new thread
-- `comment_prob`: probability to comment
