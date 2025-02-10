@@ -24,7 +24,7 @@ COSMOS initializes a population of generative agents with given social, psycholo
 3. Run:
 
    ```bash
-    python main.py 
+    python experiments/main.py 
     ```
 Upon completion, simulation data will be stored into a JSON file at the specified `path` in `experiments/config.json`. For details about `experiments/config.json`, see `api_reference.md`.
 # License
