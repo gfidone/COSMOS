@@ -1,6 +1,6 @@
 <img src="docs/circle.png" alt="Descrizione" width="150" align="left">
 
-# COSMOS: API Reference
+# API Reference
 </br>
 </br>
 </br>
