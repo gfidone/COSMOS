@@ -9,7 +9,7 @@
 ### Methods
 - `__init__(model_path, thread_prob, comment_prob, tau, thr, topics, moderate_template, profiles)`
   
-  **Inizializes a COSMOS object.**
+  **Inizializes a COSMOS object.** These parameters are located in the `init` section of `experiments/config.json`.
    
     - `model_path` (*str*): path to the LLM (HuggingFace Hub).
     - `thread_prob` (*float*): probability to generate a post.
@@ -22,7 +22,7 @@
 
 - `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None, generation_config=None, seed=None, active_stream=True)`
 
-    **Runs a simulation.**
+    **Runs a simulation.** These parameters are located in the `run` section of `experiments/config.json`.
     - `n_timesteps` (*int*): number of timestamps.
     - `post_no_memory` (*str*): prompt template for post action without memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module).
     - `post_memory` (*str*): prompt template for post action with memory. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<intervention></intervention>` (memory module).
@@ -40,7 +40,7 @@
     - active_stream (*bool*, default `True`): generate counterfactual or not.
 - `export(path)`
   
-  **Exports results in JSON format.**
+  **Exports results in JSON format.** These parameters are located in the `export` section of `experiments/config.json`.
    - `path` (*str*): path to JSON file with simulation results.
      
 ### Attributes
