@@ -6,7 +6,7 @@ import warnings
 import random
 import time
 import re
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 from perspective_api import detector
 from pipeline import Pipeline
 from prompt import Prompt
