@@ -8,7 +8,7 @@ import warnings
 
 class Pipeline():
     
-    def __init__(self, model_path, device, torch_dtype=torch.float32):
+    def __init__(self, model_path, device, torch_dtype=torch.float16):
         self.model_path = model_path
         self.torch_dtype = torch_dtype
         self.device = device
