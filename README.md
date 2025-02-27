@@ -2,7 +2,7 @@
   <img src="docs/cosmos.png" width="500"/>
 </p>
 
-### What is COSMOS?
+### Welcome to COSMOS.
 COSMOS (COunterfactual Simulations of MOderation Strategies) is an Online Social Network (OSN) simulator based on the Agent-Based Modeling (ABM) framework and powered with a Large Language Model (LLM). Differently from other OSN simulators, COSMOS is designed for evaluating the effectiveness of content moderation strategies on the toxic behavior emerging from users' socio-psychological traits and their social interplay.
 
 ### Why COSMOS?
