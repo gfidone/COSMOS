@@ -77,7 +77,7 @@
 - `intervene`: Flag for ex-ante interventions  
 - `ban`: Flag for ban  
 - `ofsa`: Flag for one-size-fits-all strategy (if `False` and `intervene` is `True`, strategy is PMI)  
-- `tolerance`: Ban tolerance (`e`)  
+- `tolerance`: Ban tolerance (*e*)  
 - `moderate_prompt`: Prompt for generating PMI about `a_content`  
 - `intervention`: PMI generated about `a_content`  
 - `username`: User's username  
