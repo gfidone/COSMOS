@@ -6,7 +6,7 @@ import warnings
 import random
 import time
 import re
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 from perspective_api import detector
 from pipeline import Pipeline
 from prompt import Prompt
@@ -44,7 +44,7 @@ class Simulator():
             self._add_to_feed(thread_id = data['thread_id'],
                               parent_id = data['parent_id'],
                               **{'username':user.profile['username'],
-                              'l_content':data['l_content'],
+                              'b_content':data['b_content'],
                               'a_content':data['a_content']}) 
             self.history[self.current_timestep].append(data)
     
@@ -63,9 +63,9 @@ class Simulator():
     def _action(self, user, seed): 
         '''Executes action.'''
         
-        data = {k: None for k in ['topic', 'root_id', 'thread_id', 'parent_id', 'node_id', 'l_prompt', 'a_prompt', 
-                                 'l_output', 'a_output', 'l_tags', 'a_tags', 'l_content', 'a_content', 
-                                 'l_toxic_rate', 'a_toxic_rate']} 
+        data = {k: None for k in ['topic', 'root_id', 'thread_id', 'parent_id', 'node_id', 'b_prompt', 'a_prompt', 
+                                 'b_output', 'a_output', 'b_tags', 'a_tags', 'b_content', 'a_content', 
+                                 'b_toxicity', 'a_toxicity']} 
         data.update({'censored': user.banned, 'banned': user.banned})
         active_stream = not user.banned
         if self.current_timestep == 0 and user == self.users[0]: # first user at first timestep is forced to post
@@ -81,7 +81,7 @@ class Simulator():
                                       generation_config=self.generation_config, 
                                       active_stream=active_stream, 
                                       seed=seed))
-            data['l_toxic_rate'], data['a_toxic_rate'] = self._get_toxic_rates(data)
+            data['b_toxicity'], data['a_toxicity'] = self._get_toxic_rates(data)
             data['thread_id'] = len(self.feed)
             data['node_id'] = self.n_nodes
             data['root_id'] = data['node_id']
@@ -101,21 +101,21 @@ class Simulator():
                                               generation_config=self.generation_config, 
                                               active_stream=active_stream, 
                                               seed=seed))
-                    data['l_toxic_rate'], data['a_toxic_rate'] = self._get_toxic_rates(data)
+                    data['b_toxicity'], data['a_toxicity'] = self._get_toxic_rates(data)
                     data['node_id'] = self.n_nodes
         return data
     
     def _get_toxic_rates(self, data):
         '''Returns toxic rates for a node.'''
         
-        l_t = detector(data['l_content'])
-        a_t = l_t if data['l_content'] == data['a_content'] else detector(data['a_content'])
+        l_t = detector(data['b_content'])
+        a_t = l_t if data['b_content'] == data['a_content'] else detector(data['a_content'])
         return l_t, a_t
     
     def _sample_content(self, user):
         '''Gets a node from a time-adaptive probability distribution.'''
         
-        time_distribution = {(node['thread_id'], node['node_id'], node['user_id'], node['l_content'], node['a_content'], node['censored']): self.history.index(timestep)
+        time_distribution = {(node['thread_id'], node['node_id'], node['user_id'], node['b_content'], node['a_content'], node['censored']): self.history.index(timestep)
         for timestep in self.history for node in timestep if node['node_id'] is not None}
         for info in time_distribution:
             is_author_of_child = self._is_author_of_child(info[0], info[1], user)
@@ -155,7 +155,7 @@ class Simulator():
         for i, node in enumerate(tqdm(self.history[self.current_timestep], desc=f'Timestep {self.current_timestep}: simulating moderation')):
             if node['a_content'] is not None:
                 user = self.get_user_by_id(node['user_id'])
-                if node['a_toxic_rate'] is not None and node['a_toxic_rate'] > self.thr:
+                if node['a_toxicity'] is not None and node['a_toxicity'] > self.thr:
                     user.n_toxic_actions +=1
                     if self.intervene:
                         self._intervene(user, i, node)
@@ -233,7 +233,7 @@ class Simulator():
         self.current_timestep = -1
         self.n_nodes = 0
         
-        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + 50*(self.n_users*6) # number of seeds needed in the worst case scenario
+        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + self.n_timesteps*(self.n_users*6) # number of seeds needed in the worst case scenario
         
         random.seed(self.seed)
         self.seeds = [random.randint(0, 2**32 - 1) for _ in range(max_seeds)]
@@ -250,7 +250,7 @@ class Simulator():
                 break
     
     def export(self, path=None):
-        '''Exports data of experiment as csv.'''
+        '''Exports data of experiment as JSON.'''
         
         if not self.history:
             raise TypeError('simulation data not found: execute run() before exporting data')
@@ -278,5 +278,5 @@ class Simulator():
         if path is None:
             raise TypeError('you must enter a valid path for dowloading json file')
         else:
-            data.to_json(path)
+            data.to_json(path, index=False)
     
