@@ -17,7 +17,7 @@
     - `tau` (*float*): temperature of the softmax function for selecting a node of the news feed.
     - `thr` (*float*): toxicity threshold for moderator activation.
     - `topics` (*list[str]*): array of topics for generating a post.
-    - `moderate_template` (*str*): prompt template for moderator in PMI mode. For correct processing, it must feature XML tags `<personal information></personal information>` (profile module) and `<user submission>{content}</user submission>` (user submission).
+    - `moderate_template` (*str*): prompt template for moderator in PMI mode. For correct processing, it must feature `<personal information></personal information>` (profile module) and `<user submission>{content}</user submission>` (user submission).
     - `profiles` (*list[dict]*): profile modules (as a list of dictionaries). `username` is mandatory.
 
 - `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None, generation_config=None, seed=None, active_stream=True)`
