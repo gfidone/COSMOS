@@ -37,7 +37,7 @@
     - `intervention` (*str | None*, default `None`): message of OFSA strategy. Requires `one_size_fits_all=True`.
     - `generation_config` (*dict | None*, default `None`): configuration for LLM generation as a dictionary of parameters. `max_new_tokens` is mandatory.
     - `seed` (*int | None*, default `None`): random seed for reproducibility.
-    - active_stream (*bool*, default `True`): generate counterfactual or not.
+    - `active_stream`(*bool*, default `True`): generate counterfactual or not.
 - `export(path)`
   
   **Exports results in JSON format.** These parameters are located in the `export` section of `experiments/config.json`.
@@ -46,3 +46,54 @@
 ### Attributes
 - `feed` (*list[networkx.DiGraph]*): array of threads as directed graphs (`networkx`).
 - `history` (*list[list[dict]*): array of timestamps, where each timestamp is an array containing dictionaries for storing information about each action.
+
+## Output JSON fields
+
+- `user_id`: ID of the user  
+- `memory`: Content of the memory module  
+- `time`: Timestamp  
+- `seed`: Random seed used at inference time  
+- `topic`: Topic to populate the sensory module (only for posts)  
+- `thread_id`: ID of the thread 
+- `node_id`: ID of the node 
+- `root_id`: `node_id` of the root  
+- `parent_id`: `node_id` of the parent (if `None`, the submission is a post)  
+- `b_prompt`: Prompt before moderation  
+- `a_prompt`: Prompt after moderation  
+- `b_output`: Output before moderation  
+- `a_output`: Output after moderation  
+- `b_tags`: Flag for XML tags correctly formatted in `b_output`  
+- `a_tags`: Flag for XML tags correctly formatted in `a_output`  
+- `b_content`: Text within XML tags in `b_output`  
+- `a_content`: Text within XML tags in `a_output`  
+- `b_toxicity`: Toxicity of `b_content` (Perspective API)  
+- `a_toxicity`: Toxicity of `a_content` (Perspective API)  
+- `censored`: Flag for submission censored as an indirect effect of ban  
+- `banned`: Flag for submission censored as a direct effect of ban  
+- `out_degree`: Out-degree of node  
+- `simulate_seed`: COSMOS random seed 
+- `thread_prob`: Probability to post  
+- `comment_prob`: Probability to comment  
+- `intervene`: Flag for ex-ante interventions  
+- `ban`: Flag for ban  
+- `ofsa`: Flag for one-size-fits-all strategy (if `False` and `intervene` is `True`, strategy is PMI)  
+- `tolerance`: Ban tolerance (`e`)  
+- `moderate_prompt`: Prompt for generating PMI about `a_content`  
+- `intervention`: PMI generated about `a_content`  
+- `username`: User's username  
+- `age`: User's age  
+- `gender`: User's gender  
+- `race`: User's race  
+- `income`: User's income  
+- `education`: User's education  
+- `sex orientation`: User's sex orientation  
+- `political leaning`: User's political leaning  
+- `religion`: User's religion  
+- `agreeableness`: User's agreeableness (OCEAN)  
+- `openness`: User's openness (OCEAN)  
+- `conscientiousness`: User's conscientiousness (OCEAN)  
+- `extraversion`: User's extraversion (OCEAN)  
+- `neuroticism`: User's neuroticism (OCEAN)  
+- `do_sample`: `do_sample` parameter (see transformers.GenerationConfig)  
+- `temperature`: `temperature` parameter (see transformers.GenerationConfig)  
+- `max_new_tokens`: `max_new_tokens` parameter (see transformers.GenerationConfig)
