@@ -24,8 +24,8 @@
 
     **Runs a simulation.** These parameters are located in the `run` section of `experiments/config.json`.
     - `n_timesteps` (*int*): number of timestamps.
-    - `post_no_memory` (*str*): prompt template for post action without memory. For correct processing, it must feature `<personal information></personal information>` (profile module).
-    - `post_memory` (*str*): prompt template for post action with memory. For correct processing, it must feature `<personal information></personal information>` (profile module) and `<intervention>{intervention}</intervention>` (memory module).
+    - `post_no_memory` (*str*): prompt template for post action without memory. For correct processing, it must feature `<personal information></personal information>` (profile module) and `{topic}` (sensory module).
+    - `post_memory` (*str*): prompt template for post action with memory. For correct processing, it must feature `<personal information></personal information>` (profile module), `<intervention>{intervention}</intervention>` (memory module) and `{topic}` (sensory module).
     - `comment_no_memory` (*str*): prompt template for comment action without memory. For correct processing, it must feature `<personal information></personal information>` (profile module) and `<thread>{thread}</thread>` (sensory module).
     - `comment_memory` (*str*): prompt template for comment action with memory. For correct processing, it must feature `<personal information></personal information>` (profile module), `<thread>{thread}</thread>` (sensory module) and `<intervention>{intervention}</intervention>` (memory module).
     - `intervene` (*bool*, default `True`): use *ex ante* interventions or not.
