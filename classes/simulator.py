@@ -33,7 +33,7 @@ class Simulator():
         
         random.seed(self.seeds.pop())
         random.shuffle(self.users)
-        for user in tqdm(self.users, desc=f'Timestep {self.current_timestep}: simulating user interactions'):
+        for user in tqdm(self.users, desc=f'Time {self.current_timestep}: simulating user interactions'):
             data = {'user_id':user.id,
                     'memory':user.interventions[-self.memory_size:],
                     'time':self.current_timestep,
@@ -152,7 +152,7 @@ class Simulator():
     
     def _moderate(self):
         '''Executes moderation (interventions and/or bans).'''      
-        for i, node in enumerate(tqdm(self.history[self.current_timestep], desc=f'Timestep {self.current_timestep}: simulating moderation')):
+        for i, node in enumerate(tqdm(self.history[self.current_timestep], desc=f'Time {self.current_timestep}: simulating moderation')):
             if node['a_content'] is not None:
                 user = self.get_user_by_id(node['user_id'])
                 if node['a_toxicity'] is not None and node['a_toxicity'] > self.thr:
