@@ -94,7 +94,7 @@
 - `conscientiousness`: user's conscientiousness (OCEAN)  
 - `extraversion`: user's extraversion (OCEAN)  
 - `neuroticism`: user's neuroticism (OCEAN)  
-- `do_sample`: `do_sample` parameter (see transformers.GenerationConfig)  
-- `temperature`: `temperature` parameter (see transformers.GenerationConfig)  
-- `max_new_tokens`: `max_new_tokens` parameter (see transformers.GenerationConfig)  
+- `do_sample`: `do_sample` parameter (see `transformers.GenerationConfig`)  
+- `temperature`: `temperature` parameter (see `transformers.GenerationConfig`)  
+- `max_new_tokens`: `max_new_tokens` parameter (see `transformers.GenerationConfig`)  
 
