@@ -1,4 +1,4 @@
-To ensure realistic simulations, experiments with COSMOS use profile information partially derived from PANDORA, a dataset of real Reddit users annotated with OCEAN personality scores. To guarantee maximum privacy, we follow the ethics code of psychological research and do not disclose potentially sensitive information in the config.json file.
+To ensure realistic simulations, experiments with COSMOS have involved profile information partially derived from PANDORA, a dataset of real Reddit users annotated with OCEAN personality scores. To guarantee maximum privacy, we follow the ethics code of psychological research and do not disclose potentially sensitive information in the config.json file.
 
 You can request the full profile data by completing the following form: ... 
 
