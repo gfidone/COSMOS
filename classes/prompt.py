@@ -6,9 +6,12 @@ class DefaultDict(dict):
 
 class Prompt:
     
-    def __init__(self, template, user_attributes, profile_tags=('<personal information>', '</personal information>')):
+    def __init__(self, 
+                 template, 
+                 agent_attributes, 
+                 profile_tags=('<personal information>', '</personal information>')):
         self.template = template
-        self.attributes = user_attributes
+        self.attributes = agent_attributes
         self.profile_tags = profile_tags
         self.format_template()
         

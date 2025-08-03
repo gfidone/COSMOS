@@ -1,5 +1,5 @@
 import requests
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 import time
 
 class PerspectiveAPI:
@@ -62,7 +62,7 @@ class PerspectiveAPI:
         return scores
             
         
-API_KEY = None # your API key
+API_KEY = 'AIzaSyAlh7RHlDMVcvgP5wK6EhrvrpWq4YDhlLw'
 detector = PerspectiveAPI(API_KEY)
         
     

@@ -8,18 +8,26 @@ import warnings
 
 class Pipeline():
     
-    def __init__(self, model_path, device, torch_dtype=torch.float16):
+    def __init__(self, 
+                 model_path, 
+                 device, 
+                 torch_dtype=torch.float16):
         self.model_path = model_path
         self.torch_dtype = torch_dtype
         self.device = device
         self._load_model()
     
     def _load_model(self):
-        model = AutoModelForCausalLM.from_pretrained(self.model_path, torch_dtype=self.torch_dtype)
-        tokenizer = AutoTokenizer.from_pretrained(self.model_path)
+        model = AutoModelForCausalLM.from_pretrained(self.model_path, 
+                                                     torch_dtype=self.torch_dtype)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_path, 
+                                                  legacy=True)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token_id == tokenizer.eos_token_id
-        self.pipeline = pipeline(model=model, task='text-generation', tokenizer=tokenizer, device=self.device)
+        self.pipeline = pipeline(model=model, 
+                                 task='text-generation', 
+                                 tokenizer=tokenizer, 
+                                 device=self.device)
     
     def _set_seed(self, seed):
         torch.manual_seed(seed)
@@ -39,7 +47,7 @@ class Pipeline():
             self._set_seed(seed)
         try:
             output = self.pipeline(prompt, 
-                                   truncation=False, # do not truncate!
+                                   truncation=False,
                                    pad_token_id=2,
                                    return_full_text=False,
                                    **generation_config)[0]['generated_text']
@@ -54,7 +62,7 @@ class Pipeline():
             tags = ('<comment>', '</comment>')
         else:
             tags = ('<intervention>', '</intervention>')
-        content = re.search(f"{tags[0]}(.*?){tags[1]}", output, re.DOTALL) # search for content inside the tags
+        content = re.search(f"{tags[0]}(.*?){tags[1]}", output, re.DOTALL) 
         if content is not None:
             correct_tags = True#
             content = content.group(1)

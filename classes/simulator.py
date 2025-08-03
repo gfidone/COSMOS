@@ -7,15 +7,24 @@ import random
 import time
 import re
 from tqdm import tqdm
-from perspective_api import detector
-from pipeline import Pipeline
-from prompt import Prompt
-from user import User
+
+from .perspective_api import detector
+from .pipeline import Pipeline
+from .prompt import Prompt
+from .user import User
 
 
 class Simulator():
 
-    def __init__(self, model_path, thread_prob, profiles, moderate_template, topics, comment_prob=1, tau=3, thr=0.5): 
+    def __init__(self, 
+                 model_path, 
+                 profiles, 
+                 moderate_template, 
+                 topics, 
+                 thr, 
+                 thread_prob=0.5, 
+                 comment_prob=0.5, 
+                 tau=3): 
         
         self.pipeline = Pipeline(model_path, device='cuda')
         self.topics = topics
@@ -24,7 +33,7 @@ class Simulator():
         self.thread_prob = thread_prob 
         self.comment_prob = comment_prob
         self.tau = tau
-        self.thr=0.5
+        self.thr=thr
         self.n_users = len(profiles)
         self.profiles = profiles
     
@@ -33,10 +42,11 @@ class Simulator():
         
         random.seed(self.seeds.pop())
         random.shuffle(self.users)
-        for user in tqdm(self.users, desc=f'Time {self.current_timestep}: simulating user interactions'):
+        for user in tqdm(self.users, 
+                         desc=f'Time {self.current_iter}: user interactions'):
             data = {'user_id':user.id,
                     'memory':user.interventions[-self.memory_size:],
-                    'time':self.current_timestep,
+                    'time':self.current_iter,
                     'seed':self.seeds.pop()
                    }
             action_data = self._action(user=user, seed=data['seed'])
@@ -46,12 +56,12 @@ class Simulator():
                               **{'username':user.profile['username'],
                               'b_content':data['b_content'],
                               'a_content':data['a_content']}) 
-            self.history[self.current_timestep].append(data)
+            self.history[self.current_iter].append(data)
     
     def _add_to_feed(self, thread_id=None, parent_id=None, **attributes):
         '''Add a new node in the news feed.'''
         
-        if parent_id == None: # if the node is a root node
+        if parent_id == None: 
             thread = nx.DiGraph() 
             thread.add_node(self.n_nodes, **attributes) 
             self.feed.append(thread) 
@@ -66,43 +76,41 @@ class Simulator():
         data = {k: None for k in ['topic', 'root_id', 'thread_id', 'parent_id', 'node_id', 'b_prompt', 'a_prompt', 
                                  'b_output', 'a_output', 'b_tags', 'a_tags', 'b_content', 'a_content', 
                                  'b_toxicity', 'a_toxicity']} 
-        data.update({'censored': user.banned, 'banned': user.banned})
-        active_stream = not user.banned
-        if self.current_timestep == 0 and user == self.users[0]: # first user at first timestep is forced to post
-            k = 0
+        data.update({'banned': user.banned, 'censored': user.banned}) 
+        if self.current_iter == 0 and user == self.users[0]: # first user at first timestep is forced to post
+            action = 'post'
         else:
+            weights = [self.thread_prob, self.comment_prob, (1 - self.thread_prob - self.comment_prob)]
             random.seed(self.seeds.pop())
-            k = random.random()
-        if k <= self.thread_prob:
+            action = random.choices(['post', 'comment', None], weights=weights, k=1)[0]
+        if action == 'post':
             random.seed(self.seeds.pop()) 
             data['topic'] = random.choice(self.topics) # select topic 
             seed = self.seeds.pop() 
             data.update(user.generate(topic=data['topic'], 
                                       generation_config=self.generation_config, 
-                                      active_stream=active_stream, 
+                                      #active_stream=active_stream, censored always false
                                       seed=seed))
             data['b_toxicity'], data['a_toxicity'] = self._get_toxic_rates(data)
             data['thread_id'] = len(self.feed)
             data['node_id'] = self.n_nodes
             data['root_id'] = data['node_id']
-        else:
+        elif action == 'comment':
             if len(self.feed) > 0:
                 data['thread_id'], data['parent_id'], censored = self._sample_content(user)
-                random.seed(self.seeds.pop())
-                if random.random() <= self.comment_prob: 
-                    if censored: 
-                        data['censored'] = True # if parent node is censored (for ban), terminate on moderated stream
-                        active_stream = False 
-                    parent = self.feed[data['thread_id']].nodes[data['parent_id']]
-                    data['root_id'], root = self._get_root(data['thread_id'])
-                    seed = self.seeds.pop()
-                    data.update(user.generate(parent=parent, 
-                                              root=root, 
-                                              generation_config=self.generation_config, 
-                                              active_stream=active_stream, 
-                                              seed=seed))
-                    data['b_toxicity'], data['a_toxicity'] = self._get_toxic_rates(data)
-                    data['node_id'] = self.n_nodes
+                if censored: 
+                    data['censored'] = True 
+                    censored = True
+                parent = self.feed[data['thread_id']].nodes[data['parent_id']] 
+                data['root_id'], root = self._get_root(data['thread_id'])
+                seed = self.seeds.pop()
+                data.update(user.generate(parent=parent, 
+                                          root=root, 
+                                          generation_config=self.generation_config, 
+                                          censored = censored,
+                                          seed=seed))
+                data['b_toxicity'], data['a_toxicity'] = self._get_toxic_rates(data)
+                data['node_id'] = self.n_nodes
         return data
     
     def _get_toxic_rates(self, data):
@@ -152,34 +160,34 @@ class Simulator():
     
     def _moderate(self):
         '''Executes moderation (interventions and/or bans).'''      
-        for i, node in enumerate(tqdm(self.history[self.current_timestep], desc=f'Time {self.current_timestep}: simulating moderation')):
+        for i, node in enumerate(tqdm(self.history[self.current_iter], desc=f'Time {self.current_iter}: moderation')):
             if node['a_content'] is not None:
                 user = self.get_user_by_id(node['user_id'])
                 if node['a_toxicity'] is not None and node['a_toxicity'] > self.thr:
                     user.n_toxic_actions +=1
-                    if self.intervene:
-                        self._intervene(user, i, node)
+                    if self.exante:
+                        self._exante(user, i, node)
                     if self.ban: 
                         self._ban(user)
     
-    def _intervene(self, user, i, node):
+    def _exante(self, user, i, node):
         '''Implements ex ante moderation.'''
         
-        if self.one_size_fits_all:
-            intervention = self.intervention
+        if self.osfa:
+            message = self.default
             moderate_prompt = None
         else:
             node = self.feed[node['thread_id']].nodes[node['node_id']]
-            if self.intervene_func == None:
+            if self.func == None:
                 moderate_prompt = self.moderate_prompt(content=node['a_content'], 
                                                        **user.profile)
-                output, correct_tags, intervention = self.pipeline.inference(moderate_prompt, 
+                output, correct_tags, message = self.pipeline.inference(moderate_prompt, 
                                                                              seed=self.moderate_seeds.pop(0))
             else:
-                intervention = self.intervene_func(node['a_content']) # wrapper
-        user.interventions.append(intervention)
-        self.history[self.current_timestep][i]['intervention'] = intervention
-        self.history[self.current_timestep][i]['moderate_prompt'] = moderate_prompt
+                message = self.func(node['a_content']) # wrapper
+        user.interventions.append(message)
+        self.history[self.current_iter][i]['intervention'] = message
+        self.history[self.current_iter][i]['moderate_prompt'] = moderate_prompt
     
     def _ban(self, user):   
         '''Executes ban.'''
@@ -209,47 +217,68 @@ class Simulator():
         
         self.history.append(list())
         self._interact() 
-        if self.current_timestep < self.n_timesteps - 1:
+        if self.current_iter < self.n_iter - 1:
             self._moderate()
                 
-    def run(self, n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None,
-                 generation_config=None, seed=None, active_stream=True):
+    def run(self, 
+            n_iter, 
+            post_no_memory, 
+            post_memory, 
+            comment_no_memory, 
+            comment_memory, 
+            export_path, 
+            exante=True, 
+            func=None, 
+            ban=False, 
+            memory_size=1, 
+            osfa=False, 
+            default=None, 
+            tolerance=None, 
+            generation_config=None, 
+            active_stream=None,
+            seed=None
+           ):
         '''Runs the simulation.'''
         
-        self.n_timesteps = n_timesteps
-        self.intervene = intervene
+        self.n_iter = n_iter
+        self.exante = exante
+        self.func = func
         self.ban = ban
         self.memory_size = memory_size
-        self.one_size_fits_all = one_size_fits_all
-        self.intervention = intervention
+        self.osfa = osfa
+        self.default = default
         self.tolerance = tolerance
         self.generation_config = generation_config
-        self.active_stream = active_stream
-        self.seed = self.seed = random.randint(0, 2**32 - 1) if seed == None else seed
+        self.seed = random.randint(0, 2**32 - 1) if seed == None else seed
         self.feed = list() 
         self.history = list() 
         self.users = [User(self.pipeline, id, profile, post_no_memory, post_memory, comment_no_memory, comment_memory, memory_size=self.memory_size) for id, profile in enumerate(self.profiles)] 
         self.active_users = [user for user in self.users]
-        self.current_timestep = -1
+        self.current_iter = -1
         self.n_nodes = 0
         
-        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + self.n_timesteps*(self.n_users*6) # number of seeds needed in the worst case scenario
+        max_seeds =  self.n_users*2 + 1 + 4*(self.n_users-1) + self.n_iter*(self.n_users*6) # number of seeds needed in the worst case scenario
         
         random.seed(self.seed)
         self.seeds = [random.randint(0, 2**32 - 1) for _ in range(max_seeds)]
         
         random.seed(self.seed)
         self.moderate_seeds = [random.randint(0, 2**32 - 1) for _ in range(self.n_users*50)]
-                    
-        for i in tqdm(range(self.n_timesteps), desc=f'Simulation'):
-            self.current_timestep += 1
-            if len(self.active_users): 
-                self._step() 
-            else:
-                warnings.warn('All users have been banned.')
-                break
+        
+        try:       
+            for i in tqdm(range(self.n_iter), desc=f'Simulation'):
+                self.current_iter += 1
+                if len(self.active_users): 
+                    self._step() 
+                else:
+                    warnings.warn('All users have been banned.')
+                    break
+                self.export(export_path)
+        except KeyboardInterrupt:
+            raise
     
-    def export(self, path=None):
+    def export(self, 
+               path=None):
         '''Exports data of experiment as JSON.'''
         
         if not self.history:
@@ -264,10 +293,10 @@ class Simulator():
                                 'simulate_seed':self.seed,
                                 'thread_prob':self.thread_prob,
                                 'comment_prob':self.comment_prob,
-                                'intervene':self.intervene,
+                                'exante':self.exante,
                                 'ban':self.ban,
                                 'memory_size':self.memory_size,
-                                'one_size_fits_all':self.one_size_fits_all,
+                                'osfa':self.osfa,
                                 'tolerance':self.tolerance,
                                 'generation_config':self.generation_config, 
                                })
@@ -278,5 +307,5 @@ class Simulator():
         if path is None:
             raise TypeError('you must enter a valid path for dowloading json file')
         else:
-            data.to_json(path)
+            data.to_json(path, orient='table', index=False)
     
