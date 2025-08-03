@@ -80,7 +80,6 @@
 - `do_sample`: `do_sample` parameter (see `transformers.GenerationConfig`)  
 - `temperature`: `temperature` parameter (see `transformers.GenerationConfig`)  
 - `max_new_tokens`: `max_new_tokens` parameter (see `transformers.GenerationConfig`)
-- `username`: user's username
 
-Beyond `username`, output JSON fields also include all the attributes used for profile modules.
+Output JSON fields also include all the attributes used for profile modules.
 
