@@ -20,28 +20,25 @@
     - `moderate_template` (*str*): prompt template for moderator in PMI mode. For correct processing, it must feature `<personal information></personal information>` (profile module) and `<user submission>{content}</user submission>` (user submission).
     - `profiles` (*list[dict]*): profile modules (as a list of dictionaries). `username` is mandatory.
 
-- `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, intervene=True, intervene_func=None, ban=False, memory_size=1, one_size_fits_all=False, intervention=None, tolerance=None, generation_config=None, seed=None, active_stream=True)`
+- `run(n_timesteps, post_no_memory, post_memory, comment_no_memory, comment_memory, exante=True, func=None, ban=False, memory_size=1, osfa=False, default=None, tolerance=None, generation_config=None, seed=None, active_stream=True)`
 
     **Runs a simulation.** These parameters are located in the `run` section of `experiments/config.json`.
-    - `n_timesteps` (*int*): number of timestamps.
+    - `n_iter` (*int*): number of iterations (timestamps).
     - `post_no_memory` (*str*): prompt template for post action without memory. For correct processing, it must feature `<personal information></personal information>` (profile module) and `{topic}` (sensory module).
     - `post_memory` (*str*): prompt template for post action with memory. For correct processing, it must feature `<personal information></personal information>` (profile module), `<intervention>{intervention}</intervention>` (memory module) and `{topic}` (sensory module).
     - `comment_no_memory` (*str*): prompt template for comment action without memory. For correct processing, it must feature `<personal information></personal information>` (profile module) and `<thread>{thread}</thread>` (sensory module).
     - `comment_memory` (*str*): prompt template for comment action with memory. For correct processing, it must feature `<personal information></personal information>` (profile module), `<thread>{thread}</thread>` (sensory module) and `<intervention>{intervention}</intervention>` (memory module).
-    - `intervene` (*bool*, default `True`): use *ex ante* interventions or not.
-    - `intervene_func` (*callable | None*, default `None`): wrapper for external *ex ante* function. Requires `intervene=True`.
+    - `exante` (*bool*, default `True`): use *ex ante* moderation or not.
+    - `func` (*callable | None*, default `None`): wrapper for external *ex ante* function. Requires `exante=True`.
     - `ban` (*bool*, default `False`): use ban or not.
     - `tolerance` (*int | None*, default `None`): maximum number of infractions before the user is banned. Requires `ban=True`.
     - `memory_size` (default 1): maximum number of interventions stored in memory.
-    - `one_size_fits_all` (*bool*, default `False`): use OFSA strategy. Requires `intervene=True`.
-    - `intervention` (*str | None*, default `None`): message of OFSA strategy. Requires `one_size_fits_all=True`.
+    - `osfa` (*bool*, default `False`): use OFSA strategy. Requires `exante=True`.
+    - `default` (*str | None*, default `None`): default message for OFSA. Requires `osfa=True`.
     - `generation_config` (*dict | None*, default `None`): configuration for LLM generation as a dictionary of parameters. `max_new_tokens` is mandatory.
     - `seed` (*int | None*, default `None`): random seed for reproducibility.
     - `active_stream`(*bool*, default `True`): generate counterfactual or not.
-- `export(path)`
-  
-  **Exports results in JSON format.** These parameters are located in the `export` section of `experiments/config.json`.
-   - `path` (*str*): path to JSON file with simulation results.
+    - `path` (*str*): path to JSON file with simulation results.
      
 ### Attributes
 - `feed` (*list[networkx.DiGraph]*): array of threads as directed graphs (`networkx`).
@@ -74,9 +71,9 @@
 - `simulate_seed`: COSMOS random seed  
 - `thread_prob`: probability to post  
 - `comment_prob`: probability to comment  
-- `intervene`: flag for ex-ante interventions  
+- `exante`: flag for ex-ante interventions  
 - `ban`: flag for ban  
-- `ofsa`: flag for one-size-fits-all strategy (if `False` and `intervene` is `True`, strategy is PMI)  
+- `osfa`: flag for one-size-fits-all strategy (if `False` and `intervene` is `True`, strategy is PMI)  
 - `tolerance`: ban tolerance (*e*)  
 - `moderate_prompt`: prompt for generating PMI about `a_content`  
 - `intervention`: PMI generated about `a_content`  
