@@ -3,7 +3,7 @@
 </p>
 
 ### Welcome to COSMOS.
-COSMOS (COunterfactual Simulations of MOderation Strategies) is an Online Social Network (OSN) simulator based on the Agent-Based Modeling (ABM) framework and powered with a Large Language Model (LLM). Differently from other OSN simulators, COSMOS is designed for evaluating the effectiveness of content moderation strategies on the toxic behavior emerging from users' socio-psychological traits and their social interplay.
+COSMOS (COunterfactual Simulations of MOderation Strategies) is a simulator of Online Social Network (OSN) conversations based on the Agent-Based Modeling (ABM) framework and powered with a Large Language Model (LLM). Differently from other simulators, COSMOS is designed for evaluating the effectiveness of content moderation strategies on the toxic behavior emerging from users' socio-psychological traits and social interplay.
 
 ### Why COSMOS?
 Assessing if a content moderation strategy is successfull or not can be challenging, for at least three reasons: 
@@ -15,20 +15,20 @@ Assessing if a content moderation strategy is successfull or not can be challeng
 With COSMOS, we provide a cost-effective, maximally controllable solution for *generating* your evidence rather than *collecting* it from the real world.
 
 ### How does COSMOS work?
-COSMOS initializes a population of generative agents with given social, psychological or demographic characteristics. In a simulation run, agents generate posts and comments in a OSN-like environment. Each action is replicated in a *counterfactual* stream of events where a moderation strategy is enforced under *ceteris paribus* conditions. In this way, at the end of the simulation you can tell *what would have happened* if that moderation strategy was employed on that population of users.
+COSMOS initializes a population of LLM-based agents with custom social, psychological or demographic characteristics. In a simulation run, agents generate posts and comments in a OSN-like environment. Each action is replicated in a *counterfactual* simulation where a chosen moderation strategy is enforced under *ceteris paribus* conditions. In this way, at the end of the simulation you can tell *what would have happened* if that moderation strategy was employed on that population of users.
 
 ### How to use COSMOS?
 
 1. Ensure that sufficient GPU memory is available for allocating the LLM.
 2. Initialize your Perspective API key in `classes/perspective_api.py`.
 3. Edit the `experiments/config.json` file with your preferred configuration. For details about `experiments/config.json`, see `api_reference.md`.
-4. Include the `classes` directory in your python path.
-5. Run:
+4. Run:
 
    ```bash
     python3 experiments/main.py 
     ```
 
-Upon completion, simulation data will be stored into a JSON file at the specified `path` in `experiments/config.json`. For details about JSON output fields, see `api_reference.md`.
+Simulation data will be progressively stored into a JSON file at the specified `path` in `experiments/config.json`. For details about JSON output fields, see `api_reference.md`.
+
 # License
 COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
