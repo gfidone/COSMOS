@@ -77,21 +77,10 @@
 - `tolerance`: ban tolerance (*e*)  
 - `moderate_prompt`: prompt for generating PMI about `a_content`  
 - `intervention`: PMI generated about `a_content`  
-- `username`: user's username  
-- `age`: user's age  
-- `gender`: user's gender  
-- `race`: user's race  
-- `income`: user's income  
-- `education`: user's education  
-- `sex orientation`: user's sex orientation  
-- `political leaning`: user's political leaning  
-- `religion`: user's religion  
-- `agreeableness`: user's agreeableness (OCEAN)  
-- `openness`: user's openness (OCEAN)  
-- `conscientiousness`: user's conscientiousness (OCEAN)  
-- `extraversion`: user's extraversion (OCEAN)  
-- `neuroticism`: user's neuroticism (OCEAN)  
 - `do_sample`: `do_sample` parameter (see `transformers.GenerationConfig`)  
 - `temperature`: `temperature` parameter (see `transformers.GenerationConfig`)  
-- `max_new_tokens`: `max_new_tokens` parameter (see `transformers.GenerationConfig`)  
+- `max_new_tokens`: `max_new_tokens` parameter (see `transformers.GenerationConfig`)
+- `username`: user's username
+
+Beyond `username`, output JSON fields also include all the attributes used for profile modules.
 
