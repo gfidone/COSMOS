@@ -55,10 +55,10 @@
 - `node_id`: id of the node  
 - `root_id`: `node_id` of the root  
 - `parent_id`: `node_id` of the parent (if `None`, the submission is a post)  
-- `b_prompt`: prompt before moderation  
-- `a_prompt`: prompt after moderation  
-- `b_output`: output before moderation  
-- `a_output`: output after moderation  
+- `b_prompt`: factual prompt  
+- `a_prompt`: counterfactual prompt 
+- `b_output`: factual output
+- `a_output`: counterfactual output 
 - `b_tags`: flag for XML tags correctly formatted in `b_output`  
 - `a_tags`: flag for XML tags correctly formatted in `a_output`  
 - `b_content`: text within XML tags in `b_output`  
@@ -73,7 +73,7 @@
 - `comment_prob`: probability to comment  
 - `exante`: flag for ex-ante interventions  
 - `ban`: flag for ban  
-- `osfa`: flag for one-size-fits-all strategy (if `False` and `intervene` is `True`, strategy is PMI)  
+- `osfa`: flag for one-size-fits-all strategy (if `False` and `exante` is `True`, strategy is PMI)  
 - `tolerance`: ban tolerance (*e*)  
 - `moderate_prompt`: prompt for generating PMI about `a_content`  
 - `intervention`: PMI generated about `a_content`  
