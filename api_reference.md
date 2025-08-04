@@ -1,7 +1,5 @@
 # API Reference
 </br>
-</br>
-</br>
 
 ## Class `Simulator`
 ### Methods
