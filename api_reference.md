@@ -1,5 +1,3 @@
-<img src="docs/circle.png" alt="Descrizione" width="150" align="left">
-
 # API Reference
 </br>
 </br>
