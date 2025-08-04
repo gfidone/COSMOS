@@ -1,4 +1,4 @@
-json=='2.0.9'
+json==2.0.9
 numpy==1.24.4
 pandas==2.0.3
 networkx==3.1
