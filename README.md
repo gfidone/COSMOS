@@ -19,7 +19,7 @@ With COSMOS, we provide a cost-effective, maximally controllable solution for *g
   <div style="flex: 1;">
     COSMOS initializes a population of LLM-based agents with custom social, psychological or demographic characteristics. In a simulation run, agents generate posts and comments in a OSN-like environment. Each action is replicated in a *counterfactual* simulation where a chosen moderation strategy is enforced under *ceteris paribus* conditions. In this way, at the end of the simulation you can tell *what would have happened* if that moderation strategy was employed on that population of users.
   </div>
-  <img src="path/to/image.png" alt="Simulation diagram" style="max-width: 300px; margin-left: 20px;">
+  <img src="docs/net.png" alt="Simulation diagram" style="max-width: 300px; margin-left: 20px;">
 </div>
 
 # Usage
