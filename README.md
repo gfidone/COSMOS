@@ -29,7 +29,7 @@ COSMOS initializes a population of LLM-based agents with custom social, psycholo
     python3 experiments/main.py 
     ```
 
-Simulation data will be progressively stored into a JSON file at the specified `path` in `experiments/config.json`. For details about JSON output fields, see `api_reference.md`.
+Simulation data will be progressively stored into a JSON file at the specified `export_path` in `experiments/config.json`. For details about JSON output fields, see `api_reference.md`.
 
 # License
 COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
