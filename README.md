@@ -38,16 +38,14 @@ COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt
 
 **If you use COSMOS for your research, please cite:**
 ```bibtex
-@article{Fidone_Passaro_Guidotti_2026,
-  title={Evaluating Online Moderation via LLM-Powered Counterfactual Simulations},
-  volume={40},
-  url={https://ojs.aaai.org/index.php/AAAI/article/view/41186},
-  DOI={10.1609/aaai.v40i45.41186},
-  number={45},
-  journal={Proceedings of the AAAI Conference on Artificial Intelligence},
-  author={Fidone, Giacomo and Passaro, Lucia and Guidotti, Riccardo},
-  year={2026},
-  month={Mar.},
-  pages={38451-38459}
-}
+  @inproceedings{Fidone_Passaro_Guidotti_2026,
+    author       = {Giacomo Fidone and
+                    Lucia C. Passaro and
+                    Riccardo Guidotti},
+    title        = {Evaluating Online Moderation via LLM-Powered Counterfactual Simulations},
+    booktitle    = {{AAAI}},
+    pages        = {38451--38459},
+    publisher    = {{AAAI} Press},
+    year         = {2026}
+  }
 ```
