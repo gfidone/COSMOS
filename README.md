@@ -18,7 +18,7 @@ With COSMOS, we provide a cost-effective, maximally controllable solution for *g
 
 COSMOS initializes a population of LLM-based agents with custom social, psychological or demographic characteristics. In a simulation run, agents generate posts and comments in a OSN-like environment. Each action is replicated in a *counterfactual* simulation where a chosen moderation strategy is enforced under *ceteris paribus* conditions. In this way, at the end of the simulation you can tell *what would have happened* if that moderation strategy was employed on that population of users. 
 
-For more details, read our pre-print paper [here](https://arxiv.org/abs/2511.07204)!
+For more details, read our paper at https://ojs.aaai.org/index.php/AAAI/article/view/41186.
 
 # Usage
 
@@ -35,3 +35,19 @@ Simulation data will be progressively stored into a JSON file at the specified `
 
 # License
 COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
+
+**If you use COSMOS for your research, please cite:**
+```bibtex
+@article{Fidone_Passaro_Guidotti_2026,
+  title={Evaluating Online Moderation via LLM-Powered Counterfactual Simulations},
+  volume={40},
+  url={https://ojs.aaai.org/index.php/AAAI/article/view/41186},
+  DOI={10.1609/aaai.v40i45.41186},
+  number={45},
+  journal={Proceedings of the AAAI Conference on Artificial Intelligence},
+  author={Fidone, Giacomo and Passaro, Lucia and Guidotti, Riccardo},
+  year={2026},
+  month={Mar.},
+  pages={38451-38459}
+}
+```
