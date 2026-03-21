@@ -23,7 +23,7 @@ For more details, read our paper at https://ojs.aaai.org/index.php/AAAI/article/
 # Usage
 
 1. Download this repository on your local machine.
-2. Initialize your Perspective API key in `classes/perspective_api.py`. If you do not have one, you can submit a request [here](https://support.perspectiveapi.com/s/docs-get-started).
+2. Initialize your Perspective API key in `classes/perspective_api.py`. If you do not have one, you can submit a request [here](https://support.perspectiveapi.com/s/docs-get-started). **Update**: Perspective API will be unavailable by the end of 2026. After that date, it will be replaced with `detoxify` (see details [here](https://pypi.org/project/detoxify/)).
 3. Edit the `experiments/config.json` file with your desired configuration. For details, see `api_reference.md`.
 4. Run:
 
