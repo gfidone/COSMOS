@@ -18,7 +18,7 @@ With COSMOS, we provide a cost-effective, maximally controllable solution for *g
 
 COSMOS initializes a population of LLM-based agents with custom social, psychological or demographic characteristics. In a simulation run, agents generate posts and comments in a OSN-like environment. Each action is replicated in a *counterfactual* simulation where a chosen moderation strategy is enforced under *ceteris paribus* conditions. In this way, at the end of the simulation you can tell *what would have happened* if that moderation strategy was employed on that population of users. 
 
-For more details, read our paper at https://ojs.aaai.org/index.php/AAAI/article/view/41186.
+For more details, read our paper [here](https://ojs.aaai.org/index.php/AAAI/article/view/41186).
 
 # Usage
 
@@ -32,7 +32,7 @@ For more details, read our paper at https://ojs.aaai.org/index.php/AAAI/article/
 
 Simulation data will be available in a JSON file at the specified `export_path` in `experiments/config.json`. For details about JSON output fields, see `api_reference.md`.
 
-**Update**: Perspective API will be no longer in service after 2026 and usage requests have been addressed until February 2026. For this reason, COSMOS now uses a `detoxify` detector instead. 
+**Update**: Perspective API will be no longer in service after 2026 and usage requests have been addressed until February 2026. For this reason, COSMOS now uses a `detoxify` detector instead. For more details, check [here](https://pypi.org/project/detoxify/). 
 
 # License
 COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
