@@ -8,7 +8,7 @@ import time
 import re
 from tqdm import tqdm
 
-from .perspective_api import detector
+from .detector import detector 
 from .pipeline import Pipeline
 from .prompt import Prompt
 from .user import User
