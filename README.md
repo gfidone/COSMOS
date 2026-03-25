@@ -23,15 +23,16 @@ For more details, read our paper at https://ojs.aaai.org/index.php/AAAI/article/
 # Usage
 
 1. Download this repository on your local machine.
-2. Initialize your Perspective API key in `classes/perspective_api.py`. If you do not have one, you can submit a request [here](https://support.perspectiveapi.com/s/docs-get-started). **Update**: Perspective API will be unavailable by the end of 2026. After that date, it will be replaced with `detoxify` (see details [here](https://pypi.org/project/detoxify/)).
-3. Edit the `experiments/config.json` file with your desired configuration. For details, see `api_reference.md`.
-4. Run:
+2. Edit the `experiments/config.json` file with your desired configuration. For details, see `api_reference.md`.
+3. Run:
 
    ```bash
     python3 experiments/main.py 
     ```
 
 Simulation data will be available in a JSON file at the specified `export_path` in `experiments/config.json`. For details about JSON output fields, see `api_reference.md`.
+
+**Update**: Perspective API will be no longer in service after 2026 and usage requests have been addressed until February 2026. For this reason, COSMOS now uses a `detoxify` detector instead. 
 
 # License
 COSMOS is distributed under the GNU General Public License. Refer to LICENSE.txt for details.
